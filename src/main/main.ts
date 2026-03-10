@@ -51,9 +51,6 @@ function createWindow() {
       });
   }
 
-  // Open DevTools to see errors
-  mainWindow.webContents.openDevTools();
-
   mainWindow.on('closed', () => {
     mainWindow = null;
   });

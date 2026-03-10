@@ -45,15 +45,21 @@ contextBridge.exposeInMainWorld('electron', {
   
   // Progress listeners
   onConversionProgress: (callback: (progress: FFmpegProgress & { jobId: string }) => void) => {
-    ipcRenderer.on(IPC_CHANNELS.CONVERSION_PROGRESS, (_, progress) => callback(progress));
+    const listener = (_: any, progress: any) => callback(progress);
+    ipcRenderer.on(IPC_CHANNELS.CONVERSION_PROGRESS, listener);
+    return () => ipcRenderer.removeListener(IPC_CHANNELS.CONVERSION_PROGRESS, listener);
   },
   
   onConversionComplete: (callback: (job: ConversionJob) => void) => {
-    ipcRenderer.on(IPC_CHANNELS.CONVERSION_COMPLETE, (_, job) => callback(job));
+    const listener = (_: any, job: any) => callback(job);
+    ipcRenderer.on(IPC_CHANNELS.CONVERSION_COMPLETE, listener);
+    return () => ipcRenderer.removeListener(IPC_CHANNELS.CONVERSION_COMPLETE, listener);
   },
   
   onConversionError: (callback: (error: { jobId: string; message: string }) => void) => {
-    ipcRenderer.on(IPC_CHANNELS.CONVERSION_ERROR, (_, error) => callback(error));
+    const listener = (_: any, error: any) => callback(error);
+    ipcRenderer.on(IPC_CHANNELS.CONVERSION_ERROR, listener);
+    return () => ipcRenderer.removeListener(IPC_CHANNELS.CONVERSION_ERROR, listener);
   },
   
   // Queue management
@@ -87,9 +93,9 @@ declare global {
       getHardwareInfo: () => Promise<HardwareInfo>;
       startConversion: (inputPath: string, outputPath: string, settings: ConversionSettings) => Promise<string>;
       cancelConversion: (jobId: string) => Promise<boolean>;
-      onConversionProgress: (callback: (progress: FFmpegProgress & { jobId: string }) => void) => void;
-      onConversionComplete: (callback: (job: ConversionJob) => void) => void;
-      onConversionError: (callback: (error: { jobId: string; message: string }) => void) => void;
+      onConversionProgress: (callback: (progress: FFmpegProgress & { jobId: string }) => void) => () => void;
+      onConversionComplete: (callback: (job: ConversionJob) => void) => () => void;
+      onConversionError: (callback: (error: { jobId: string; message: string }) => void) => () => void;
       getQueue: () => Promise<ConversionJob[]>;
       removeFromQueue: (jobId: string) => Promise<boolean>;
       clearQueue: () => Promise<boolean>;

@@ -64,7 +64,7 @@ function App() {
     window.electron.getHardwareInfo().then(setHardwareInfo);
 
     // Setup progress listeners
-    window.electron.onConversionProgress((progress) => {
+    const unsubProgress = window.electron.onConversionProgress((progress) => {
       setConversionQueue((queue) =>
         queue.map((job) =>
           job.id === progress.jobId
@@ -74,11 +74,11 @@ function App() {
       );
     });
 
-    window.electron.onConversionComplete((completedJob) => {
+    const unsubComplete = window.electron.onConversionComplete((completedJob) => {
       // Add to history
       if (completedJob.startTime && completedJob.outputSize) {
         const historyItem: ConversionHistoryType = {
-          id: completedJob.id,
+          id: `history-${completedJob.id}-${Date.now()}`,
           timestamp: Date.now(),
           originalFile: {
             name: completedJob.inputFile.name,
@@ -118,7 +118,7 @@ function App() {
       );
     });
 
-    window.electron.onConversionError((error) => {
+    const unsubError = window.electron.onConversionError((error) => {
       setConversionQueue((queue) =>
         queue.map((job) =>
           job.id === error.jobId
@@ -127,6 +127,13 @@ function App() {
         )
       );
     });
+
+    // Cleanup function to remove all listeners
+    return () => {
+      unsubProgress();
+      unsubComplete();
+      unsubError();
+    };
   }, []);
 
   const handleFilesSelected = (files: VideoFile[]) => {

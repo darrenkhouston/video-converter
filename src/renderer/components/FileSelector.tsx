@@ -108,7 +108,7 @@ const FileSelector: React.FC<FileSelectorProps> = ({
       };
 
       const fileName = file.name.replace(/\.[^/.]+$/, '');
-      const outputPath = `${outputFolder}\\${fileName}.${settings.outputFormat}`;
+      const outputPath = `${outputFolder}/${fileName}.${settings.outputFormat}`;
 
       console.log('Starting batch conversion:', { inputPath: file.path, outputPath, settings });
 
@@ -164,7 +164,7 @@ const FileSelector: React.FC<FileSelectorProps> = ({
 
     // Use path.join equivalent - construct proper path for Windows/Mac/Linux
     const fileName = file.name.replace(/\.[^/.]+$/, '');
-    const outputPath = `${outputFolder}\\${fileName}.${settings.outputFormat}`;
+    const outputPath = `${outputFolder}/${fileName}.${settings.outputFormat}`;
 
     console.log('Starting conversion:', { inputPath: file.path, outputPath, settings });
 
@@ -199,7 +199,7 @@ const FileSelector: React.FC<FileSelectorProps> = ({
 
     for (const file of filesToConvert) {
       const fileName = file.name.replace(/\.[^/.]+$/, '');
-      const outputPath = `${outputFolder}\\${fileName}.${settings.outputFormat}`;
+      const outputPath = `${outputFolder}/${fileName}.${settings.outputFormat}`;
 
       console.log('Starting conversion:', { inputPath: file.path, outputPath, settings });
 
