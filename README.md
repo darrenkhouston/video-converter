@@ -96,12 +96,22 @@ This will start both the Vite dev server (React) and Electron in development mod
 npm run build
 ```
 
-### Package for distribution:
+### Package for your current platform:
 ```bash
 npm run make
 ```
 
-This will create installers for your platform in the `out` directory.
+### Build for specific platforms:
+```bash
+npm run make:mac      # macOS (requires macOS)
+npm run make:win      # Windows (best on Windows)
+npm run make:linux    # Linux (works anywhere)
+```
+
+### Build for ALL platforms:
+Use GitHub Actions (recommended) or build on each platform. See **[BUILDING.md](BUILDING.md)** for complete multi-platform build instructions.
+
+This will create installers in the `out` directory.
 
 ## Project Structure
 
@@ -205,7 +215,11 @@ Hardware acceleration can provide 2-5x faster encoding speeds with lower CPU usa
 - `npm run dev` - Start development mode
 - `npm run build` - Build for production
 - `npm run package` - Package application
-- `npm run make` - Create distributable installers
+- `npm run make` - Create installers for current platform
+- `npm run make:mac` - Build for macOS
+- `npm run make:win` - Build for Windows
+- `npm run make:linux` - Build for Linux
+- `npm run publish` - Publish to GitHub Releases
 - `npm run dev:renderer` - Start Vite dev server only
 - `npm run dev:main` - Compile and run Electron main process
 
@@ -220,6 +234,7 @@ Launch with DevTools open:
 Additional documentation is available:
 
 - **[QUICKSTART.md](QUICKSTART.md)** - Quick setup and first run guide
+- **[BUILDING.md](BUILDING.md)** - Multi-platform build instructions (Windows, Mac, Linux)
 - **[SETUP_UPDATES.md](SETUP_UPDATES.md)** - Configure auto-updates with GitHub Releases
 - **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Common issues and solutions
 - **[PROJECT_SUMMARY.md](PROJECT_SUMMARY.md)** - Complete project overview and architecture
