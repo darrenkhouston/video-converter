@@ -18,6 +18,15 @@ const IPC_CHANNELS = {
   GET_SETTINGS: 'get-settings',
   SAVE_SETTINGS: 'save-settings',
   GENERATE_THUMBNAIL: 'generate-thumbnail',
+  CHECK_FOR_UPDATES: 'check-for-updates',
+  DOWNLOAD_UPDATE: 'download-update',
+  INSTALL_UPDATE: 'install-update',
+  GET_APP_VERSION: 'get-app-version',
+  UPDATE_AVAILABLE: 'update-available',
+  UPDATE_NOT_AVAILABLE: 'update-not-available',
+  UPDATE_DOWNLOAD_PROGRESS: 'update-download-progress',
+  UPDATE_DOWNLOADED: 'update-downloaded',
+  UPDATE_ERROR: 'update-error',
 } as const;
 
 contextBridge.exposeInMainWorld('electron', {
@@ -82,6 +91,49 @@ contextBridge.exposeInMainWorld('electron', {
   // Thumbnail
   generateThumbnail: (filePath: string, timestamp: number): Promise<string> => 
     ipcRenderer.invoke(IPC_CHANNELS.GENERATE_THUMBNAIL, filePath, timestamp),
+  
+  // Auto-updates
+  checkForUpdates: (): Promise<boolean> => 
+    ipcRenderer.invoke(IPC_CHANNELS.CHECK_FOR_UPDATES),
+  
+  downloadUpdate: (): Promise<boolean> => 
+    ipcRenderer.invoke(IPC_CHANNELS.DOWNLOAD_UPDATE),
+  
+  installUpdate: (): Promise<boolean> => 
+    ipcRenderer.invoke(IPC_CHANNELS.INSTALL_UPDATE),
+  
+  getAppVersion: (): Promise<string> => 
+    ipcRenderer.invoke(IPC_CHANNELS.GET_APP_VERSION),
+  
+  onUpdateAvailable: (callback: (info: { version: string; releaseDate: string; releaseNotes: string }) => void) => {
+    const listener = (_: any, info: any) => callback(info);
+    ipcRenderer.on(IPC_CHANNELS.UPDATE_AVAILABLE, listener);
+    return () => ipcRenderer.removeListener(IPC_CHANNELS.UPDATE_AVAILABLE, listener);
+  },
+  
+  onUpdateNotAvailable: (callback: () => void) => {
+    const listener = () => callback();
+    ipcRenderer.on(IPC_CHANNELS.UPDATE_NOT_AVAILABLE, listener);
+    return () => ipcRenderer.removeListener(IPC_CHANNELS.UPDATE_NOT_AVAILABLE, listener);
+  },
+  
+  onUpdateDownloadProgress: (callback: (progress: { percent: number; transferred: number; total: number; bytesPerSecond: number }) => void) => {
+    const listener = (_: any, progress: any) => callback(progress);
+    ipcRenderer.on(IPC_CHANNELS.UPDATE_DOWNLOAD_PROGRESS, listener);
+    return () => ipcRenderer.removeListener(IPC_CHANNELS.UPDATE_DOWNLOAD_PROGRESS, listener);
+  },
+  
+  onUpdateDownloaded: (callback: (info: { version: string }) => void) => {
+    const listener = (_: any, info: any) => callback(info);
+    ipcRenderer.on(IPC_CHANNELS.UPDATE_DOWNLOADED, listener);
+    return () => ipcRenderer.removeListener(IPC_CHANNELS.UPDATE_DOWNLOADED, listener);
+  },
+  
+  onUpdateError: (callback: (error: { message: string }) => void) => {
+    const listener = (_: any, error: any) => callback(error);
+    ipcRenderer.on(IPC_CHANNELS.UPDATE_ERROR, listener);
+    return () => ipcRenderer.removeListener(IPC_CHANNELS.UPDATE_ERROR, listener);
+  },
 });
 
 declare global {
@@ -102,6 +154,15 @@ declare global {
       getSettings: () => Promise<any>;
       saveSettings: (settings: any) => Promise<boolean>;
       generateThumbnail: (filePath: string, timestamp: number) => Promise<string>;
+      checkForUpdates: () => Promise<boolean>;
+      downloadUpdate: () => Promise<boolean>;
+      installUpdate: () => Promise<boolean>;
+      getAppVersion: () => Promise<string>;
+      onUpdateAvailable: (callback: (info: { version: string; releaseDate: string; releaseNotes: string }) => void) => () => void;
+      onUpdateNotAvailable: (callback: () => void) => () => void;
+      onUpdateDownloadProgress: (callback: (progress: { percent: number; transferred: number; total: number; bytesPerSecond: number }) => void) => () => void;
+      onUpdateDownloaded: (callback: (info: { version: string }) => void) => () => void;
+      onUpdateError: (callback: (error: { message: string }) => void) => () => void;
     };
   }
 }

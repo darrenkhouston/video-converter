@@ -14,8 +14,10 @@ import {
   Card,
   CardContent,
   Chip,
+  Button,
+  CircularProgress,
 } from '@mui/material';
-import { CheckCircle, Cancel } from '@mui/icons-material';
+import { CheckCircle, Cancel, Update } from '@mui/icons-material';
 import type { HardwareInfo } from '../../shared/types';
 
 interface SettingsPanelProps {
@@ -26,6 +28,8 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ hardwareInfo }) => {
   const [defaultHardwareAccel, setDefaultHardwareAccel] = React.useState<string>('auto');
   const [autoStart, setAutoStart] = React.useState<boolean>(false);
   const [preserveMetadata, setPreserveMetadata] = React.useState<boolean>(true);
+  const [appVersion, setAppVersion] = React.useState<string>('');
+  const [checkingUpdates, setCheckingUpdates] = React.useState<boolean>(false);
 
   // Load settings on mount
   React.useEffect(() => {
@@ -40,6 +44,10 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ hardwareInfo }) => {
       if (settings.preserveMetadata !== undefined) {
         setPreserveMetadata(settings.preserveMetadata);
       }
+
+      // Get app version
+      const version = await window.electron.getAppVersion();
+      setAppVersion(version);
     };
     loadSettings();
   }, []);
@@ -63,6 +71,14 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ hardwareInfo }) => {
     setPreserveMetadata(checked);
     const settings = await window.electron.getSettings();
     await window.electron.saveSettings({ ...settings, preserveMetadata: checked });
+  };
+
+  // Check for updates
+  const handleCheckForUpdates = async () => {
+    setCheckingUpdates(true);
+    await window.electron.checkForUpdates();
+    // Reset checking state after 5 seconds (in case no update is found)
+    setTimeout(() => setCheckingUpdates(false), 5000);
   };
 
   return (
@@ -201,16 +217,25 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ hardwareInfo }) => {
               </Typography>
               <Divider sx={{ mb: 2 }} />
               <Typography variant="body2" color="text.secondary" paragraph>
-                <strong>Video Converter</strong> v1.0.0
+                <strong>Video Converter</strong> v{appVersion || '1.0.0'}
               </Typography>
               <Typography variant="body2" color="text.secondary" paragraph>
                 A professional video conversion tool with support for multiple formats, GPU
                 acceleration, and advanced features like trimming, subtitle embedding, and batch
                 processing.
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="text.secondary" paragraph>
                 Powered by FFmpeg • Built with Electron & React
               </Typography>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={checkingUpdates ? <CircularProgress size={16} /> : <Update />}
+                onClick={handleCheckForUpdates}
+                disabled={checkingUpdates}
+              >
+                {checkingUpdates ? 'Checking...' : 'Check for Updates'}
+              </Button>
             </CardContent>
           </Card>
         </Grid>

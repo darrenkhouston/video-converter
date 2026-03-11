@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import * as path from 'path';
 import { VideoProcessor } from './videoProcessor';
+import { AutoUpdater } from './autoUpdater';
 import { IPC_CHANNELS } from '../shared/config';
 import Store from 'electron-store';
 import type { ConversionSettings } from '../shared/types';
@@ -9,6 +10,7 @@ const store = new Store();
 const videoProcessor = new VideoProcessor();
 
 let mainWindow: BrowserWindow | null = null;
+let updater: AutoUpdater | null = null;
 
 function createWindow() {
   const preloadPath = path.join(__dirname, 'preload.js');
@@ -73,6 +75,16 @@ app.whenReady().then(() => {
   console.log('__dirname:', __dirname);
   createWindow();
   setupIpcHandlers();
+  
+  // Initialize auto-updater
+  // Temporarily enabled in development for testing
+  if (mainWindow) {
+    updater = new AutoUpdater(mainWindow);
+    // Only start periodic checks in production
+    if (process.env.NODE_ENV !== 'development') {
+      updater.startPeriodicChecks(4); // Check every 4 hours
+    }
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -169,5 +181,34 @@ function setupIpcHandlers() {
   // Thumbnail generation
   ipcMain.handle(IPC_CHANNELS.GENERATE_THUMBNAIL, async (_, filePath: string, timestamp: number) => {
     return await videoProcessor.generateThumbnail(filePath, timestamp);
+  });
+
+  // Auto-update handlers
+  ipcMain.handle(IPC_CHANNELS.CHECK_FOR_UPDATES, async () => {
+    if (updater) {
+      await updater.checkForUpdates();
+      return true;
+    }
+    return false;
+  });
+
+  ipcMain.handle(IPC_CHANNELS.DOWNLOAD_UPDATE, async () => {
+    if (updater) {
+      await updater.downloadUpdate();
+      return true;
+    }
+    return false;
+  });
+
+  ipcMain.handle(IPC_CHANNELS.INSTALL_UPDATE, async () => {
+    if (updater) {
+      updater.quitAndInstall();
+      return true;
+    }
+    return false;
+  });
+
+  ipcMain.handle(IPC_CHANNELS.GET_APP_VERSION, async () => {
+    return app.getVersion();
   });
 }

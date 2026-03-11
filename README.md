@@ -21,9 +21,10 @@ A professional desktop video converter application built with Electron, React, a
 - 📹 **Video Preview**: Preview videos before and after conversion
 - ✂️ **Video Trimming**: Cut and trim videos to specific time ranges
 - 📝 **Subtitle Support**: Embed subtitles from multiple tracks
-- 🎵 **Audio Track Selection**: Choose which audio track to keep
+- 🎵 **Audio Track Selection**: Choose which audio track to keep  
 - 📊 **Metadata Preservation**: Keep video metadata (title, artist, etc.)
 - 🎯 **Custom Resolutions**: Set any resolution (720p, 1080p, 4K, or custom)
+- 🔄 **Auto-Updates**: Automatic update checking and installation via GitHub Releases
 - 🔧 **Fine-Grained Control**:
   - CRF (Constant Rate Factor) quality control
   - Custom bitrate settings
@@ -213,6 +214,15 @@ Hardware acceleration can provide 2-5x faster encoding speeds with lower CPU usa
 Launch with DevTools open:
 - The application automatically opens DevTools in development mode
 - Press `Ctrl+Shift+I` (Windows/Linux) or `Cmd+Option+I` (Mac) to toggle
+
+## Documentation
+
+Additional documentation is available:
+
+- **[QUICKSTART.md](QUICKSTART.md)** - Quick setup and first run guide
+- **[SETUP_UPDATES.md](SETUP_UPDATES.md)** - Configure auto-updates with GitHub Releases
+- **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Common issues and solutions
+- **[PROJECT_SUMMARY.md](PROJECT_SUMMARY.md)** - Complete project overview and architecture
 
 ## License
 

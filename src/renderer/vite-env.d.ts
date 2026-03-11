@@ -18,6 +18,15 @@ declare global {
       getSettings: () => Promise<any>;
       saveSettings: (settings: any) => Promise<boolean>;
       generateThumbnail: (filePath: string, timestamp: number) => Promise<string>;
+      checkForUpdates: () => Promise<boolean>;
+      downloadUpdate: () => Promise<boolean>;
+      installUpdate: () => Promise<boolean>;
+      getAppVersion: () => Promise<string>;
+      onUpdateAvailable: (callback: (info: { version: string; releaseDate: string; releaseNotes: string }) => void) => () => void;
+      onUpdateNotAvailable: (callback: () => void) => () => void;
+      onUpdateDownloadProgress: (callback: (progress: { percent: number; transferred: number; total: number; bytesPerSecond: number }) => void) => () => void;
+      onUpdateDownloaded: (callback: (info: { version: string }) => void) => () => void;
+      onUpdateError: (callback: (error: { message: string }) => void) => () => void;
     };
   }
 }

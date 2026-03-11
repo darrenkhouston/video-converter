@@ -16,6 +16,7 @@ import FileSelector from './components/FileSelector';
 import ConversionQueue from './components/ConversionQueue';
 import SettingsPanel from './components/SettingsPanel';
 import ConversionHistory from './components/ConversionHistory';
+import UpdateNotification from './components/UpdateNotification';
 import type { VideoFile, ConversionJob, HardwareInfo, ConversionHistory as ConversionHistoryType } from '../shared/types';
 
 const theme = createTheme({
@@ -239,6 +240,7 @@ function App() {
           </TabPanel>
         </Box>
       </Box>
+      <UpdateNotification />
     </ThemeProvider>
   );
 }

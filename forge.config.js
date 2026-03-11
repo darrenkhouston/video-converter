@@ -34,4 +34,17 @@ module.exports = {
       config: {},
     },
   ],
+  publishers: [
+    {
+      name: '@electron-forge/publisher-github',
+      config: {
+        repository: {
+          owner: 'your-github-username',
+          name: 'video-converter'
+        },
+        prerelease: false,
+        draft: true
+      }
+    }
+  ],
 };
