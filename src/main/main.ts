@@ -184,7 +184,7 @@ function createApplicationMenu() {
         {
           label: 'Learn More',
           click: async () => {
-            await shell.openExternal('https://github.com/your-github-username/video-converter')
+            await shell.openExternal('https://github.com/darrenkhouston/video-converter')
           }
         }
       ]

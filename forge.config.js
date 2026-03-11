@@ -39,7 +39,7 @@ module.exports = {
       name: '@electron-forge/publisher-github',
       config: {
         repository: {
-          owner: 'your-github-username',
+          owner: 'darrenkhouston',
           name: 'video-converter'
         },
         prerelease: false,

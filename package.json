@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "Professional video converter with GPU acceleration and batch processing",
   "main": "dist/main/main/main.js",
-  "author": "Your Name",
+  "author": "Darren Houston",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-github-username/video-converter.git"
+    "url": "https://github.com/darrenkhouston/video-converter.git"
   },
   "scripts": {
     "start": "npm run build:main && electron .",

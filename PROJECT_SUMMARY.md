@@ -179,16 +179,13 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 ## 📝 Next Steps (Optional Enhancements)
 
-1. **Add Icons** - Create icon files for Windows/Mac/Linux
-2. **Testing** - Add Jest/Vitest unit tests
-3. **CI/CD** - GitHub Actions for automated builds
-4. **Auto-Updates** - Implement electron-updater
-5. **Drag Reordering** - Reorder queue items
-6. **Profiles** - Save custom conversion profiles
-7. **Batch Presets** - Apply same settings to all files
-8. **Video Preview** - Thumbnail generation and preview player
-9. **Comparison View** - Before/after comparison
-10. **Localization** - Multi-language support
+1. **Testing** - Add Jest/Vitest unit tests
+2. **CI/CD** - GitHub Actions for automated builds
+3. **Drag Reordering** - Reorder queue items
+4. **Profiles** - Save custom conversion profiles
+5. **Batch Presets** - Apply same settings to all files
+6. **Comparison View** - Before/after comparison
+7. **Localization** - Multi-language support
 
 ## 🎯 Current Status
 
