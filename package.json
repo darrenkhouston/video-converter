@@ -1,6 +1,6 @@
 {
   "name": "video-converter",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Professional video converter with GPU acceleration and batch processing",
   "main": "dist/main/main/main.js",
   "author": "Darren Houston",
@@ -17,6 +17,11 @@
     "make:win": "electron-forge make --platform=win32",
     "make:linux": "electron-forge make --platform=linux",
     "publish": "electron-forge publish",
+    "dist": "npm run build && electron-builder",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:win": "npm run build && electron-builder --win",
+    "dist:linux": "npm run build && electron-builder --linux",
+    "release": "npm run build && electron-builder --publish always",
     "dev": "concurrently \"npm run dev:renderer\" \"wait-on http://localhost:3000 && npm run dev:main\"",
     "dev:renderer": "vite",
     "dev:main": "npm run build:main && cross-env NODE_ENV=development electron .",
@@ -54,7 +59,7 @@
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
     "electron": "^28.2.0",
-    "electron-builder": "^24.9.1",
+    "electron-builder": "^24.13.3",
     "electron-icon-builder": "^2.0.1",
     "typescript": "^5.3.3",
     "vite": "^5.0.12",
@@ -72,6 +77,11 @@
       "node_modules/**/*",
       "package.json"
     ],
+    "publish": {
+      "provider": "github",
+      "owner": "darrenkhouston",
+      "repo": "video-converter"
+    },
     "win": {
       "target": [
         "nsis"
@@ -80,7 +90,8 @@
     },
     "mac": {
       "target": [
-        "dmg"
+        "dmg",
+        "zip"
       ],
       "icon": "assets/icon.icns"
     },

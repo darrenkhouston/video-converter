@@ -42,6 +42,7 @@ const UpdateNotification: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showErrorSnackbar, setShowErrorSnackbar] = useState(false);
   const [checking, setChecking] = useState(false);
+  const [showUpToDateSnackbar, setShowUpToDateSnackbar] = useState(false);
 
   useEffect(() => {
     // Set up update event listeners
@@ -55,6 +56,7 @@ const UpdateNotification: React.FC = () => {
     const unsubNotAvailable = window.electron.onUpdateNotAvailable(() => {
       console.log('No updates available');
       setChecking(false);
+      setShowUpToDateSnackbar(true);
     });
 
     const unsubDownloadProgress = window.electron.onUpdateDownloadProgress((progress) => {
@@ -229,6 +231,22 @@ const UpdateNotification: React.FC = () => {
           sx={{ width: '100%' }}
         >
           {error || 'Update error occurred'}
+        </Alert>
+      </Snackbar>
+
+      {/* Up to Date Snackbar */}
+      <Snackbar
+        open={showUpToDateSnackbar}
+        autoHideDuration={4000}
+        onClose={() => setShowUpToDateSnackbar(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+      >
+        <Alert
+          onClose={() => setShowUpToDateSnackbar(false)}
+          severity="success"
+          sx={{ width: '100%' }}
+        >
+          Your application is up to date
         </Alert>
       </Snackbar>
     </>

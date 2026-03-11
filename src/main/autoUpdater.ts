@@ -7,13 +7,8 @@ log.transports.file.level = 'info';
 autoUpdater.logger = log;
 
 // Configuration - Update these with your actual GitHub repository
-const GITHUB_OWNER = 'your-github-username';
+const GITHUB_OWNER = 'darrenkhouston';
 const GITHUB_REPO = 'video-converter';
-
-// Check if updates are properly configured
-const isUpdateConfigured = () => {
-  return GITHUB_OWNER !== 'your-github-username' && GITHUB_REPO !== 'video-converter';
-};
 
 export class AutoUpdater {
   private mainWindow: BrowserWindow | null = null;
@@ -21,11 +16,7 @@ export class AutoUpdater {
 
   constructor(mainWindow: BrowserWindow) {
     this.mainWindow = mainWindow;
-    if (isUpdateConfigured()) {
-      this.setupAutoUpdater();
-    } else {
-      log.info('Auto-updates not configured - skipping setup');
-    }
+    this.setupAutoUpdater();
   }
 
   private setupAutoUpdater() {
@@ -77,26 +68,40 @@ export class AutoUpdater {
 
     // Error handling
     autoUpdater.on('error', (error) => {
-      log.error('Update error:', error);
-      this.mainWindow?.webContents.send('update-error', {
-        message: error.message,
-      });
+      log.error('=== Update error event ===');
+      log.error('Error:', error);
+      log.error('Error message:', error.message);
+      log.error('Error name:', error.name);
+      log.error('Error stack:', error.stack);
+      
+      const errorMessage = error.message || '';
+      const errorLower = errorMessage.toLowerCase();
+      
+      // Treat these cases as "up to date":
+      // 1. No published versions found
+      // 2. Cannot find/download update manifest files (.yml files)
+      if (errorMessage.includes('No published versions on GitHub') ||
+          errorLower.includes('latest-mac.yml') ||
+          errorLower.includes('latest.yml') ||
+          errorLower.includes('cannot download') && errorLower.includes('.yml')) {
+        log.info('No installable updates available - treating as up to date');
+        this.mainWindow?.webContents.send('update-not-available');
+      } else {
+        // Show user-friendly error message for actual errors (network, private repos, etc.)
+        log.error('Showing error to user');
+        this.mainWindow?.webContents.send('update-error', {
+          message: 'Unable to check for updates',
+        });
+      }
     });
   }
 
   // Check for updates manually
   async checkForUpdates(): Promise<void> {
     try {
-      log.info('Checking for updates...');
-      
-      // Check if updates are configured
-      if (!isUpdateConfigured()) {
-        log.info('Auto-updates not configured');
-        this.mainWindow?.webContents.send('update-error', {
-          message: 'Auto-updates not configured. Please update GITHUB_OWNER and GITHUB_REPO in autoUpdater.ts with your GitHub repository details.',
-        });
-        return;
-      }
+      log.info('=== Starting update check ===');
+      log.info('Repository:', `${GITHUB_OWNER}/${GITHUB_REPO}`);
+      log.info('Environment:', process.env.NODE_ENV);
       
       // Skip in development
       if (process.env.NODE_ENV === 'development') {
@@ -105,24 +110,25 @@ export class AutoUpdater {
         return;
       }
       
-      await autoUpdater.checkForUpdates();
+      log.info('Calling autoUpdater.checkForUpdates()...');
+      const result = await autoUpdater.checkForUpdates();
+      log.info('Update check result:', result);
     } catch (error: any) {
-      log.error('Error checking for updates:', error);
+      // Note: Most errors will be handled by the 'error' event listener
+      // This catch block is mainly for setup/initialization errors
+      log.error('=== Update check exception (non-event error) ===');
+      log.error('Error:', error);
+      log.error('Error message:', error.message);
       
-      // Handle 404 errors (repository not found or no releases)
-      if (error.message?.includes('404')) {
-        this.mainWindow?.webContents.send('update-error', {
-          message: 'GitHub repository not found or has no releases. Please check your repository configuration in autoUpdater.ts',
-        });
-      } else if (error.message?.includes('ENOENT') || error.message?.includes('app-update.yml')) {
-        this.mainWindow?.webContents.send('update-error', {
-          message: 'Update checking not configured yet. Please set up GitHub releases in autoUpdater.ts',
-        });
-      } else {
-        this.mainWindow?.webContents.send('update-error', {
-          message: error.message || 'Failed to check for updates',
-        });
+      // Only handle local/initialization errors here
+      // Update checking errors are handled by the error event listener
+      const errorMessage = error.message || '';
+      if (errorMessage.includes('ENOENT') || errorMessage.includes('app-update.yml')) {
+        // Missing config file - treat as up to date
+        log.info('Update configuration file not found - treating as up to date');
+        this.mainWindow?.webContents.send('update-not-available');
       }
+      // All other errors will be handled by the error event listener
     }
   }
 
