@@ -18,6 +18,7 @@ const IPC_CHANNELS = {
   GET_SETTINGS: 'get-settings',
   SAVE_SETTINGS: 'save-settings',
   GENERATE_THUMBNAIL: 'generate-thumbnail',
+  GENERATE_THUMBNAILS: 'generate-thumbnails',
   CHECK_FOR_UPDATES: 'check-for-updates',
   DOWNLOAD_UPDATE: 'download-update',
   INSTALL_UPDATE: 'install-update',
@@ -92,6 +93,9 @@ contextBridge.exposeInMainWorld('electron', {
   generateThumbnail: (filePath: string, timestamp: number): Promise<string> => 
     ipcRenderer.invoke(IPC_CHANNELS.GENERATE_THUMBNAIL, filePath, timestamp),
   
+  generateThumbnails: (filePath: string, timestamps: number[]): Promise<string[]> => 
+    ipcRenderer.invoke(IPC_CHANNELS.GENERATE_THUMBNAILS, filePath, timestamps),
+  
   // Auto-updates
   checkForUpdates: (): Promise<boolean> => 
     ipcRenderer.invoke(IPC_CHANNELS.CHECK_FOR_UPDATES),
@@ -154,6 +158,7 @@ declare global {
       getSettings: () => Promise<any>;
       saveSettings: (settings: any) => Promise<boolean>;
       generateThumbnail: (filePath: string, timestamp: number) => Promise<string>;
+      generateThumbnails: (filePath: string, timestamps: number[]) => Promise<string[]>;
       checkForUpdates: () => Promise<boolean>;
       downloadUpdate: () => Promise<boolean>;
       installUpdate: () => Promise<boolean>;

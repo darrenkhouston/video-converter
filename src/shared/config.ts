@@ -104,6 +104,7 @@ export const IPC_CHANNELS = {
   
   // Preview
   GENERATE_THUMBNAIL: 'generate-thumbnail',
+  GENERATE_THUMBNAILS: 'generate-thumbnails',
   
   // Auto-updates
   CHECK_FOR_UPDATES: 'check-for-updates',

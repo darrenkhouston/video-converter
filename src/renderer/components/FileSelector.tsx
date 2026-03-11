@@ -20,9 +20,11 @@ import {
   Add,
   VideoFile as VideoFileIcon,
   Settings as SettingsIcon,
+  Visibility as PreviewIcon,
 } from '@mui/icons-material';
 import type { VideoFile, ConversionJob, HardwareInfo, ConversionSettings } from '../../shared/types';
 import ConversionSettingsDialog from './ConversionSettingsDialog';
+import VideoPreview from './VideoPreview';
 import { PRESETS } from '../../shared/config';
 
 interface FileSelectorProps {
@@ -43,6 +45,8 @@ const FileSelector: React.FC<FileSelectorProps> = ({
   const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
   const [currentFile, setCurrentFile] = useState<VideoFile | null>(null);
   const [batchMode, setBatchMode] = useState(false);
+  const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
+  const [previewFile, setPreviewFile] = useState<VideoFile | null>(null);
 
   const handleSelectFiles = async () => {
     const filePaths = await window.electron.selectInputFiles();
@@ -351,6 +355,18 @@ const FileSelector: React.FC<FileSelectorProps> = ({
                     ))}
                     <Button
                       size="small"
+                      variant="outlined"
+                      color="info"
+                      startIcon={<PreviewIcon />}
+                      onClick={() => {
+                        setPreviewFile(file);
+                        setPreviewDialogOpen(true);
+                      }}
+                    >
+                      Preview
+                    </Button>
+                    <Button
+                      size="small"
                       variant="contained"
                       startIcon={<SettingsIcon />}
                       onClick={() => handleAdvancedConvert(file)}
@@ -379,6 +395,15 @@ const FileSelector: React.FC<FileSelectorProps> = ({
           onConfirm={handleSettingsConfirm}
         />
       )}
+
+      <VideoPreview
+        open={previewDialogOpen}
+        onClose={() => {
+          setPreviewDialogOpen(false);
+          setPreviewFile(null);
+        }}
+        videoFile={previewFile}
+      />
     </Box>
   );
 };

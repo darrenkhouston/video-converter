@@ -1,5 +1,6 @@
-import { app, BrowserWindow, ipcMain, dialog, Menu, shell } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, Menu, shell, protocol } from 'electron';
 import * as path from 'path';
+import * as fs from 'fs';
 import { VideoProcessor } from './videoProcessor';
 import { AutoUpdater } from './autoUpdater';
 import { IPC_CHANNELS } from '../shared/config';
@@ -11,6 +12,25 @@ const videoProcessor = new VideoProcessor();
 
 let mainWindow: BrowserWindow | null = null;
 let updater: AutoUpdater | null = null;
+
+// Helper function to get content type based on file extension
+function getContentType(filePath: string): string {
+  const ext = path.extname(filePath).toLowerCase();
+  const contentTypes: { [key: string]: string } = {
+    '.mp4': 'video/mp4',
+    '.webm': 'video/webm',
+    '.ogg': 'video/ogg',
+    '.ogv': 'video/ogg',
+    '.avi': 'video/x-msvideo',
+    '.mov': 'video/quicktime',
+    '.mkv': 'video/x-matroska',
+    '.m4v': 'video/mp4',
+    '.3gp': 'video/3gpp',
+    '.flv': 'video/x-flv',
+    '.wmv': 'video/x-ms-wmv',
+  };
+  return contentTypes[ext] || 'video/mp4';
+}
 
 function createWindow() {
   const preloadPath = path.join(__dirname, 'preload.js');
@@ -175,9 +195,95 @@ function createApplicationMenu() {
   Menu.setApplicationMenu(menu);
 }
 
+// Register custom protocol for serving video files
+// This must be done before app is ready
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: 'video-file',
+    privileges: {
+      bypassCSP: true,
+      stream: true,
+      supportFetchAPI: true,
+      standard: true,
+      secure: true,
+    },
+  },
+]);
+
 app.whenReady().then(() => {
   console.log('App is ready');
   console.log('__dirname:', __dirname);
+
+  // Register the custom protocol handler for video streaming
+  protocol.registerStreamProtocol('video-file', (request, callback) => {
+    // Extract the file path from the URL (e.g., video-file:///Users/path/to/video.mp4)
+    // Remove the protocol prefix and decode the path
+    let filePath = request.url.replace('video-file://', '');
+    
+    // Ensure path starts with / (absolute path)
+    if (!filePath.startsWith('/')) {
+      filePath = '/' + filePath;
+    }
+    
+    filePath = decodeURIComponent(filePath);
+    
+    console.log('Serving video file:', filePath);
+    
+    // Check if file exists
+    if (!fs.existsSync(filePath)) {
+      console.error('File not found:', filePath);
+      callback({ statusCode: 404 });
+      return;
+    }
+    
+    try {
+      // Get file stats
+      const stat = fs.statSync(filePath);
+      const fileSize = stat.size;
+      const contentType = getContentType(filePath);
+      
+      // Parse range header if present (for seeking in video)
+      const rangeHeader = request.headers.Range || request.headers.range;
+      
+      if (rangeHeader) {
+        // Handle range requests for video seeking
+        const parts = rangeHeader.replace(/bytes=/, '').split('-');
+        const start = parseInt(parts[0], 10);
+        const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+        const chunkSize = end - start + 1;
+        
+        const stream = fs.createReadStream(filePath, { start, end });
+        
+        callback({
+          statusCode: 206,
+          headers: {
+            'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+            'Accept-Ranges': 'bytes',
+            'Content-Length': chunkSize.toString(),
+            'Content-Type': contentType,
+          },
+          data: stream,
+        });
+      } else {
+        // Return full file
+        const stream = fs.createReadStream(filePath);
+        
+        callback({
+          statusCode: 200,
+          headers: {
+            'Content-Length': fileSize.toString(),
+            'Content-Type': contentType,
+            'Accept-Ranges': 'bytes',
+          },
+          data: stream,
+        });
+      }
+    } catch (error) {
+      console.error('Error serving video:', error);
+      callback({ statusCode: 500 });
+    }
+  });
+
   createWindow();
   setupIpcHandlers();
   
@@ -289,6 +395,10 @@ function setupIpcHandlers() {
   // Thumbnail generation
   ipcMain.handle(IPC_CHANNELS.GENERATE_THUMBNAIL, async (_, filePath: string, timestamp: number) => {
     return await videoProcessor.generateThumbnail(filePath, timestamp);
+  });
+
+  ipcMain.handle(IPC_CHANNELS.GENERATE_THUMBNAILS, async (_, filePath: string, timestamps: number[]) => {
+    return await videoProcessor.generateThumbnails(filePath, timestamps);
   });
 
   // Auto-update handlers

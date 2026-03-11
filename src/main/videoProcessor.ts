@@ -3,6 +3,7 @@ import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
 import ffprobeInstaller from '@ffprobe-installer/ffprobe';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as os from 'os';
 import { promisify } from 'util';
 import type {
   VideoFile,
@@ -574,5 +575,65 @@ export class VideoProcessor {
           reject(err);
         });
     });
+  }
+
+  async generateThumbnails(filePath: string, timestamps: number[]): Promise<string[]> {
+    const fs = require('fs');
+    const tmpDir = path.join(os.tmpdir(), `video-thumbs-${Date.now()}`);
+    
+    try {
+      // Create temporary directory
+      if (!fs.existsSync(tmpDir)) {
+        fs.mkdirSync(tmpDir, { recursive: true });
+      }
+
+      // Generate all thumbnails
+      await new Promise<void>((resolve, reject) => {
+        ffmpeg(filePath)
+          .screenshots({
+            timestamps: timestamps,
+            filename: 'thumb_%i.png',
+            folder: tmpDir,
+            size: '480x270', // 16:9 aspect ratio
+          })
+          .on('end', () => resolve())
+          .on('error', (err) => reject(err));
+      });
+
+      // Read all generated thumbnails and convert to base64 data URLs
+      const dataUrls: string[] = [];
+      for (let i = 0; i < timestamps.length; i++) {
+        const thumbPath = path.join(tmpDir, `thumb_${i + 1}.png`);
+        if (fs.existsSync(thumbPath)) {
+          const imageBuffer = fs.readFileSync(thumbPath);
+          const base64 = imageBuffer.toString('base64');
+          dataUrls.push(`data:image/png;base64,${base64}`);
+        } else {
+          // If thumbnail generation failed for this timestamp, use a placeholder
+          dataUrls.push('');
+        }
+      }
+
+      // Clean up temporary files
+      fs.readdirSync(tmpDir).forEach((file: string) => {
+        fs.unlinkSync(path.join(tmpDir, file));
+      });
+      fs.rmdirSync(tmpDir);
+
+      return dataUrls;
+    } catch (error) {
+      // Clean up on error
+      try {
+        if (fs.existsSync(tmpDir)) {
+          fs.readdirSync(tmpDir).forEach((file: string) => {
+            fs.unlinkSync(path.join(tmpDir, file));
+          });
+          fs.rmdirSync(tmpDir);
+        }
+      } catch (cleanupError) {
+        console.error('Error cleaning up thumbnails:', cleanupError);
+      }
+      throw error;
+    }
   }
 }
