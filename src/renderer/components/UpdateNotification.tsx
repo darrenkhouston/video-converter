@@ -127,6 +127,14 @@ const UpdateNotification: React.FC = () => {
     return `${formatBytes(bytesPerSecond)}/s`;
   };
 
+  const stripHtml = (html: string): string => {
+    // Create a temporary div to parse HTML
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    // Get text content and clean up extra whitespace
+    return tmp.textContent || tmp.innerText || '';
+  };
+
   return (
     <>
       {/* Update Available Dialog */}
@@ -153,8 +161,8 @@ const UpdateNotification: React.FC = () => {
                   <Typography variant="subtitle2" gutterBottom>
                     What's New:
                   </Typography>
-                  <Typography variant="body2" component="pre" sx={{ whiteSpace: 'pre-wrap' }}>
-                    {updateInfo.releaseNotes}
+                  <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                    {stripHtml(updateInfo.releaseNotes)}
                   </Typography>
                 </Box>
               )}
