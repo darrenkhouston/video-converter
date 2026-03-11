@@ -1,11 +1,17 @@
+const path = require('path');
+
 module.exports = {
   packagerConfig: {
     name: 'Video Converter',
     executableName: 'video-converter',
-    icon: './assets/icon',
+    icon: path.join(__dirname, 'assets', 'icons', 'icon'),
+    appBundleId: 'com.videoconverter.app',
+    appCategoryType: 'public.app-category.video',
     asar: {
       unpack: '**/node_modules/@ffmpeg-installer/**/*,**/node_modules/@ffprobe-installer/**/*'
     },
+    osxSign: {},
+    osxNotarize: undefined,
   },
   rebuildConfig: {},
   makers: [

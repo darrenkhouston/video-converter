@@ -13,6 +13,7 @@ let mainWindow: BrowserWindow | null = null;
 function createWindow() {
   const preloadPath = path.join(__dirname, 'preload.js');
   const htmlPath = path.join(__dirname, '../../renderer/index.html');
+  const iconPath = path.join(__dirname, '../../assets/icons/512x512.png');
   
   console.log('Preload path:', preloadPath);
   console.log('HTML path:', htmlPath);
@@ -24,6 +25,7 @@ function createWindow() {
     height: 900,
     minWidth: 1200,
     minHeight: 700,
+    icon: iconPath,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
