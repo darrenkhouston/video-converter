@@ -104,7 +104,9 @@
         "AppImage",
         "deb"
       ],
-      "icon": "assets/icon.png"
+      "icon": "assets/icon.png",
+      "maintainer": "Darren Houston <darren@darrenhouston.com>",
+      "category": "Video"
     }
   }
 }
