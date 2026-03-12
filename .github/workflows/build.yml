@@ -81,10 +81,20 @@ jobs:
         with:
           path: artifacts
 
+      - name: Display structure of downloaded files
+        run: ls -R artifacts
+
+      - name: Flatten and filter artifacts
+        run: |
+          mkdir -p release-files
+          find artifacts -type f \( -name "*.dmg" -o -name "*.zip" -o -name "*.exe" -o -name "*.deb" -o -name "*.AppImage" -o -name "*.rpm" -o -name "*.blockmap" \) -exec cp {} release-files/ \;
+          find artifacts -type f -name "latest*.yml" -exec cp {} release-files/ \;
+          ls -lh release-files/
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: artifacts/**/*
+          files: release-files/*
           draft: true
           generate_release_notes: true
         env:
