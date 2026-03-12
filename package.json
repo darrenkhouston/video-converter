@@ -1,6 +1,6 @@
 {
   "name": "video-converter",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Professional video converter with GPU acceleration and batch processing",
   "main": "dist/main/main/main.js",
   "author": "Darren Houston",
@@ -76,6 +76,10 @@
       "dist/**/*",
       "node_modules/**/*",
       "package.json"
+    ],
+    "asarUnpack": [
+      "node_modules/@ffmpeg-installer/**/*",
+      "node_modules/@ffprobe-installer/**/*"
     ],
     "publish": {
       "provider": "github",
