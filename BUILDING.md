@@ -6,14 +6,14 @@ This guide explains how to build the Video Converter application for Windows, ma
 
 **Current platform only:**
 ```bash
-npm run make
+npm run dist
 ```
 
 **Specific platforms (with limitations):**
 ```bash
-npm run make:mac      # macOS only (requires macOS)
-npm run make:win      # Windows (limited on Mac/Linux)
-npm run make:linux    # Linux (works on any platform)
+npm run dist:mac      # macOS only (requires macOS)
+npm run dist:win      # Windows (limited on Mac/Linux)
+npm run dist:linux    # Linux (works on any platform)
 ```
 
 **All platforms (recommended):**
@@ -95,10 +95,10 @@ The most reliable method for production builds.
 Build for macOS:
 ```bash
 npm run build
-npm run make:mac
+npm run dist:mac
 ```
 
-Output: `out/make/zip/darwin/x64/video-converter-darwin-x64-1.0.0.zip`
+Output: `release/Video Converter-1.0.0-mac.zip`, `release/Video Converter-1.0.0.dmg`
 
 ### On Windows PC
 
@@ -108,12 +108,10 @@ Output: `out/make/zip/darwin/x64/video-converter-darwin-x64-1.0.0.zip`
    ```bash
    npm install
    npm run build
-   npm run make:win
+   npm run dist:win
    ```
 
-Output:
-- `out/make/squirrel.windows/x64/video-converter-1.0.0 Setup.exe`
-- `out/make/zip/win32/x64/video-converter-win32-x64-1.0.0.zip`
+Output: `release/Video Converter Setup 1.0.0.exe`
 
 ### On Linux Machine
 
@@ -123,13 +121,13 @@ Output:
    ```bash
    npm install
    npm run build
-   npm run make:linux
+   npm run dist:linux
    ```
 
 Output:
-- `out/make/deb/x64/video-converter_1.0.0_amd64.deb`
-- `out/make/rpm/x64/video-converter-1.0.0-1.x86_64.rpm`
-- `out/make/zip/linux/x64/video-converter-linux-x64-1.0.0.zip`
+- `release/video-converter_1.0.0_amd64.deb`
+- `release/video-converter-1.0.0.AppImage`
+- Additional: `release/latest-linux.yml` (for auto-updates)
 
 ---
 
@@ -149,13 +147,13 @@ Requires Wine to create Windows executables:
 2. **Build for Windows:**
    ```bash
    npm run build
-   npm run make:win
+   npm run dist:win
    ```
 
 **Limitations:**
 - May have signing issues
-- Not officially supported by Electron Forge
-- Native Windows build recommended for production
+- NSIS installer works better from Linux/Mac than older Squirrel installer
+- Native Windows build still recommended for production
 
 ### From macOS: Build Linux Packages (✅ Works)
 
@@ -163,10 +161,10 @@ Linux packages can be built from macOS without issues:
 
 ```bash
 npm run build
-npm run make:linux
+npm run dist:linux
 ```
 
-This creates .deb and .rpm packages that work on Linux systems.
+This creates .deb and .AppImage packages that work on Linux systems.
 
 ---
 
@@ -185,7 +183,7 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 RUN npm run build
-RUN npm run make:linux
+RUN npm run dist:linux
 
 CMD ["bash"]
 ```
@@ -194,7 +192,7 @@ CMD ["bash"]
 
 ```bash
 docker build -f Dockerfile.build -t video-converter-builder .
-docker run --rm -v $(pwd)/out:/app/out video-converter-builder
+docker run --rm -v $(pwd)/release:/app/release video-converter-builder
 ```
 
 ---
@@ -216,16 +214,16 @@ docker run --rm -v $(pwd)/out:/app/out video-converter-builder
 ```bash
 # Build for your current platform only
 npm run build
-npm run make
+npm run dist
 ```
 
 ### For Production Releases
 ```bash
-# Use GitHub Actions
+# Use GitHub Actions (RECOMMENDED)
 git tag v1.0.0
 git push origin v1.0.0
 # Wait for GitHub to build all platforms
-# Download from Releases page
+# Review and publish draft release on GitHub
 ```
 
 ### For Enterprise (Maximum Control)
@@ -239,31 +237,27 @@ git push origin v1.0.0
 
 ### macOS
 ```
-out/make/zip/darwin/x64/
-  └── video-converter-darwin-x64-1.0.0.zip
+release/
+  ├── Video Converter-1.0.0-mac.zip
+  ├── Video Converter-1.0.0.dmg
+  ├── Video Converter-1.0.0-mac.zip.blockmap
+  └── latest-mac.yml              (auto-update manifest)
 ```
 
 ### Windows
 ```
-out/make/squirrel.windows/x64/
-  ├── video-converter-1.0.0 Setup.exe    (installer)
-  ├── RELEASES
-  └── video-converter-1.0.0-full.nupkg
-
-out/make/zip/win32/x64/
-  └── video-converter-win32-x64-1.0.0.zip
+release/
+  ├── Video Converter Setup 1.0.0.exe
+  ├── Video Converter Setup 1.0.0.exe.blockmap
+  └── latest.yml                   (auto-update manifest)
 ```
 
 ### Linux
 ```
-out/make/deb/x64/
-  └── video-converter_1.0.0_amd64.deb
-
-out/make/rpm/x64/
-  └── video-converter-1.0.0-1.x86_64.rpm
-
-out/make/zip/linux/x64/
-  └── video-converter-linux-x64-1.0.0.zip
+release/
+  ├── video-converter_1.0.0_amd64.deb
+  ├── video-converter-1.0.0.AppImage
+  └── latest-linux.yml             (auto-update manifest)
 ```
 
 ---
@@ -272,33 +266,34 @@ out/make/zip/linux/x64/
 
 ### macOS
 ```bash
-# Extract and run
-unzip "out/make/zip/darwin/x64/video-converter-darwin-x64-1.0.0.zip"
-open video-converter-darwin-x64-1.0.0/video-converter.app
+# Open and install DMG
+open "release/Video Converter-1.0.0.dmg"
+
+# Or extract and run from zip
+unzip "release/Video Converter-1.0.0-mac.zip"
+open "Video Converter.app"
 ```
 
 ### Windows
 ```powershell
 # Run installer
-.\out\make\squirrel.windows\x64\video-converter-1.0.0 Setup.exe
+.\release\Video Converter Setup 1.0.0.exe
 ```
 
 ### Linux (Debian/Ubuntu)
 ```bash
 # Install .deb
-sudo dpkg -i out/make/deb/x64/video-converter_1.0.0_amd64.deb
+sudo dpkg -i release/video-converter_1.0.0_amd64.deb
 
 # Run
 video-converter
 ```
 
-### Linux (RedHat/Fedora)
+### Linux (AppImage - works on all distros)
 ```bash
-# Install .rpm
-sudo rpm -i out/make/rpm/x64/video-converter-1.0.0-1.x86_64.rpm
-
-# Run
-video-converter
+# Make executable and run
+chmod +x release/video-converter-1.0.0.AppImage
+./release/video-converter-1.0.0.AppImage
 ```
 
 ---
@@ -327,7 +322,7 @@ brew install rpm
 ```bash
 # Increase Node memory
 export NODE_OPTIONS="--max-old-space-size=4096"
-npm run make
+npm run dist
 ```
 
 ---
@@ -349,7 +344,7 @@ build:mac:
   script:
     - npm install
     - npm run build
-    - npm run make:mac
+    - npm run dist:mac
 
 build:windows:
   stage: build
@@ -357,7 +352,7 @@ build:windows:
   script:
     - npm install
     - npm run build
-    - npm run make:win
+    - npm run dist:win
 
 build:linux:
   stage: build
@@ -365,7 +360,7 @@ build:linux:
   script:
     - npm install
     - npm run build
-    - npm run make:linux
+    - npm run dist:linux
 ```
 
 ### Jenkins
@@ -380,7 +375,7 @@ pipeline {
           steps {
             sh 'npm install'
             sh 'npm run build'
-            sh 'npm run make:mac'
+            sh 'npm run dist:mac'
           }
         }
         stage('Windows') {
@@ -388,7 +383,7 @@ pipeline {
           steps {
             bat 'npm install'
             bat 'npm run build'
-            bat 'npm run make:win'
+            bat 'npm run dist:win'
           }
         }
         stage('Linux') {
@@ -396,7 +391,7 @@ pipeline {
           steps {
             sh 'npm install'
             sh 'npm run build'
-            sh 'npm run make:linux'
+            sh 'npm run dist:linux'
           }
         }
       }

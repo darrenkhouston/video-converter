@@ -22,7 +22,7 @@ This folder contains the application icons for all platforms.
 ## Current Status
 
 ✅ Icon configuration is set up in:
-- forge.config.js
+- package.json (build.mac.icon and build.win.icon)
 - src/main/main.ts
 - package.json (build:icons script)
 

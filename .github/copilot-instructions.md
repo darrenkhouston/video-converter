@@ -57,7 +57,7 @@ npm run dev:renderer  # Terminal 1
 npm run dev:main      # Terminal 2 (after Vite starts)
 
 # Package for distribution
-npm run make
+npm run dist
 ```
 
 ## Project Files

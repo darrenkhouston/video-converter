@@ -11,16 +11,10 @@
   },
   "scripts": {
     "start": "npm run build:main && electron .",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
-    "make:mac": "electron-forge make --platform=darwin",
-    "make:win": "electron-forge make --platform=win32",
-    "make:linux": "electron-forge make --platform=linux",
-    "publish": "electron-forge publish",
-    "dist": "npm run build && electron-builder",
-    "dist:mac": "npm run build && electron-builder --mac",
-    "dist:win": "npm run build && electron-builder --win",
-    "dist:linux": "npm run build && electron-builder --linux",
+    "dist": "npm run build && electron-builder --publish never",
+    "dist:mac": "npm run build && electron-builder --mac --publish never",
+    "dist:win": "npm run build && electron-builder --win --publish never",
+    "dist:linux": "npm run build && electron-builder --linux --publish never",
     "release": "npm run build && electron-builder --publish always",
     "dev": "concurrently \"npm run dev:renderer\" \"wait-on http://localhost:3000 && npm run dev:main\"",
     "dev:renderer": "vite",
@@ -47,11 +41,6 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^7.2.0",
-    "@electron-forge/maker-deb": "^7.2.0",
-    "@electron-forge/maker-rpm": "^7.2.0",
-    "@electron-forge/maker-squirrel": "^7.2.0",
-    "@electron-forge/maker-zip": "^7.2.0",
     "@types/fluent-ffmpeg": "^2.1.24",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
@@ -74,7 +63,6 @@
     },
     "files": [
       "dist/**/*",
-      "node_modules/**/*",
       "package.json"
     ],
     "asarUnpack": [
@@ -90,14 +78,14 @@
       "target": [
         "nsis"
       ],
-      "icon": "assets/icon.ico"
+      "icon": "assets/icons/icon.ico"
     },
     "mac": {
       "target": [
         "dmg",
         "zip"
       ],
-      "icon": "assets/icon.icns"
+      "icon": "assets/icons/icon.icns"
     },
     "linux": {
       "target": [

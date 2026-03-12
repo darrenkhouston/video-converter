@@ -254,7 +254,7 @@ npm run build
 
 ### 15. Can't Package Application
 
-**Error:** `npm run make` fails
+**Error:** `npm run dist` fails
 
 **Solutions:**
 1. **Build First:**
@@ -262,15 +262,15 @@ npm run build
    npm run build
    ```
 
-2. **Check Electron Forge:**
+2. **Check electron-builder:**
    ```bash
-   npm install @electron-forge/cli --save-dev
+   npm install electron-builder --save-dev
    ```
 
 3. **Platform-Specific:**
    - Windows: Requires Windows SDK
    - macOS: Requires Xcode
-   - Linux: May need build tools
+   - Linux: May need build tools (fakeroot, dpkg)
 
 ## Getting Help
 

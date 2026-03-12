@@ -98,20 +98,20 @@ npm run build
 
 ### Package for your current platform:
 ```bash
-npm run make
+npm run dist
 ```
 
 ### Build for specific platforms:
 ```bash
-npm run make:mac      # macOS (requires macOS)
-npm run make:win      # Windows (best on Windows)
-npm run make:linux    # Linux (works anywhere)
+npm run dist:mac      # macOS (requires macOS)
+npm run dist:win      # Windows (best on Windows)
+npm run dist:linux    # Linux (works anywhere)
 ```
 
 ### Build for ALL platforms:
 Use GitHub Actions (recommended) or build on each platform. See **[BUILDING.md](BUILDING.md)** for complete multi-platform build instructions.
 
-This will create installers in the `out` directory.
+This will create installers in the `release` directory.
 
 ## Project Structure
 
@@ -214,12 +214,11 @@ Hardware acceleration can provide 2-5x faster encoding speeds with lower CPU usa
 
 - `npm run dev` - Start development mode
 - `npm run build` - Build for production
-- `npm run package` - Package application
-- `npm run make` - Create installers for current platform
-- `npm run make:mac` - Build for macOS
-- `npm run make:win` - Build for Windows
-- `npm run make:linux` - Build for Linux
-- `npm run publish` - Publish to GitHub Releases
+- `npm run dist` - Create installers for current platform
+- `npm run dist:mac` - Build for macOS
+- `npm run dist:win` - Build for Windows
+- `npm run dist:linux` - Build for Linux
+- `npm run release` - Publish to GitHub Releases (requires GH_TOKEN)
 - `npm run dev:renderer` - Start Vite dev server only
 - `npm run dev:main` - Compile and run Electron main process
 

@@ -32,24 +32,29 @@ const GITHUB_OWNER = 'johndoe';
 const GITHUB_REPO = 'my-video-converter';
 ```
 
-### 2. Update `forge.config.js` (Lines 80-86)
+### 2. Update `package.json` build configuration
 
-Update the publishers section:
+Update the publish section in package.json:
 
-```javascript
-publishers: [
-  {
-    name: '@electron-forge/publisher-github',
-    config: {
-      repository: {
-        owner: 'your-github-username', // ← Change this
-        name: 'video-converter'        // ← Change this if needed
-      },
-      prerelease: false,
-      draft: true
-    }
+```json
+"build": {
+  "publish": {
+    "provider": "github",
+    "owner": "your-github-username",
+    "repo": "video-converter"
   }
-]
+}
+```
+
+**Example:**
+```json
+"build": {
+  "publish": {
+    "provider": "github",
+    "owner": "johndoe",
+    "repo": "my-video-converter"
+  }
+}
 ```
 
 ### 3. Update `package.json` (repository field - optional)
@@ -95,13 +100,13 @@ When running in development mode with `npx electron .`:
 
 1. **Package the application:**
    ```bash
-   npm run make
+   npm run dist
    ```
 
 2. **Install the packaged app:**
-   - **macOS:** `out/make/zip/darwin/x64/` - Extract and move to Applications
-   - **Windows:** `out/make/squirrel.windows/x64/` - Run Setup.exe
-   - **Linux:** `out/make/deb/x64/` - Install .deb package
+   - **macOS:** `release/` - Extract .dmg or install from .zip
+   - **Windows:** `release/` - Run Setup.exe installer
+   - **Linux:** `release/` - Install .deb or .AppImage package
 
 3. **Run the installed app** (not from terminal)
 
@@ -132,32 +137,34 @@ When running in development mode with `npx electron .`:
 
 ### Publishing Workflow
 
-**Option 1: Automatic Publishing (with GITHUB_TOKEN)**
+**Option 1: Using GitHub Actions (Recommended)**
 
 ```bash
-# Build and package
-npm run build && npm run make
+# Push a version tag to trigger automatic build and release
+git tag v1.1.0
+git push origin v1.1.0
 
-# Publish to GitHub (creates draft release)
-npm run publish
-
-# Go to GitHub → Releases → Edit draft → Publish
+# GitHub Actions will:
+# - Build for all platforms
+# - Create draft release
+# - Upload installers and update manifest files
+# - You just need to publish the draft release
 ```
 
-**Option 2: Manual Upload**
+**Option 2: Manual Build and Upload**
 
 ```bash
 # Build and package
-npm run build && npm run make
+npm run build && npm run dist
 
 # Create release on GitHub manually:
 # 1. Go to your repository → Releases → Create new release
 # 2. Tag: v1.1.0 (must match package.json version)
 # 3. Title: v1.1.0 or "Version 1.1.0"
-# 4. Upload files from out/make/:
-#    - macOS: video-converter-darwin-x64-1.1.0.zip
-#    - Windows: All files from squirrel.windows folder
-#    - Linux: video-converter_1.1.0_amd64.deb
+# 4. Upload files from release/:
+#    - macOS: Video Converter-1.1.0-mac.zip, Video Converter-1.1.0.dmg, latest-mac.yml
+#    - Windows: Video Converter Setup 1.1.0.exe, latest.yml
+#    - Linux: video-converter_1.1.0_amd64.deb, video-converter-1.1.0.AppImage, latest-linux.yml
 # 5. Add release notes
 # 6. Publish release
 ```
@@ -358,20 +365,22 @@ npx electron .
 
 ```bash
 npm run build
-npm run make
-# Check out/make/ folder for installers
+npm run dist
+# Check release/ folder for installers
 ```
 
 ### Publish Release
 
 ```bash
-# Option 1: Automatic (needs GITHUB_TOKEN)
-npm run publish
+# Option 1: GitHub Actions (Recommended)
+git tag v1.0.1
+git push origin v1.0.1
+# Then publish the draft release on GitHub
 
 # Option 2: Manual
-# 1. npm run make
+# 1. npm run dist
 # 2. Go to GitHub → Releases → New
-# 3. Upload files from out/make/
+# 3. Upload files from release/ (including .yml files)
 # 4. Publish
 ```
 

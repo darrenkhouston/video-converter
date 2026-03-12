@@ -44,9 +44,9 @@ The auto-update system uses **electron-updater** which supports:
 - First check: 10 seconds after app starts
 
 **Publishing Configuration:**
-- Location: `forge.config.js`
-- Provider: GitHub Releases (default)
-- Release type: Draft (for review before publishing)
+- Location: `package.json` (build.publish section)
+- Provider: GitHub Releases
+- Automated via GitHub Actions workflow
 
 ### Publishing Updates
 
@@ -61,7 +61,7 @@ The auto-update system uses **electron-updater** which supports:
 
 ```bash
 npm run build
-npm run make
+npm run dist
 ```
 
 #### Step 3: Publish to GitHub
@@ -70,15 +70,16 @@ npm run make
 1. Go to your GitHub repository
 2. Click "Releases" → "Create a new release"
 3. Tag version: `v1.0.1` (must match package.json version)
-4. Upload the built files from `out/make/`:
-   - `*.zip` for macOS
-   - `*.exe` or `*.nupkg` for Windows
-   - `*.deb` or `*.rpm` for Linux
+4. Upload the built files from `release/`:
+   - `*.zip` and `*.dmg` for macOS
+   - `*.exe` for Windows
+   - `*.deb`, `*.rpm`, or `*.AppImage` for Linux
+   - **Important:** Include `latest-mac.yml`, `latest-linux.yml`, and `latest.yml` files
 5. Add release notes describing changes
 6. Publish the release
 
 **Option B: Using GitHub Actions (Automated)**
-1. Set up GitHub Actions workflow
+1. Set up GitHub Actions workflow (already configured in `.github/workflows/build.yml`)
 2. Push a tag: `git tag v1.0.1 && git push --tags`
 3. GitHub Actions will automatically build and publish
 
@@ -90,21 +91,21 @@ npm run make
 
 ### Configuration Files
 
-**forge.config.js**
-```javascript
-publishers: [
-  {
-    name: '@electron-forge/publisher-github',
-    config: {
-      repository: {
-        owner: 'your-github-username',  // ← Update this
-        name: 'video-converter'          // ← Update this
-      },
-      prerelease: false,    // Set true for beta releases
-      draft: true           // Creates draft release for review
-    }
+**package.json**
+```json
+"build": {
+  "publish": {
+    "provider": "github",
+    "owner": "your-github-username",
+    "repo": "video-converter"
   }
-]
+}
+```
+
+**src/main/autoUpdater.ts**
+```typescript
+const GITHUB_OWNER = 'your-github-username';
+const GITHUB_REPO = 'video-converter';
 ```
 
 **package.json**
@@ -155,23 +156,26 @@ For production, you should code sign your app:
 
 **macOS:**
 ```javascript
-// In forge.config.js
-osxSign: {
-  identity: 'Developer ID Application: Your Name (TEAM_ID)',
-  'hardened-runtime': true,
-  entitlements: 'entitlements.plist',
-  'entitlements-inherit': 'entitlements.plist',
+// In package.json
+"build": {
+  "mac": {
+    "identity": "Developer ID Application: Your Name (TEAM_ID)",
+    "hardenedRuntime": true,
+    "entitlements": "entitlements.plist",
+    "entitlementsInherit": "entitlements.plist"
+  }
 }
 ```
 
 **Windows:**
 ```javascript
-// In forge.config.js
-packagerConfig: {
-  win32metadata: {
-    SignTool: 'signtool',
-    SignToolPath: 'path/to/signtool.exe',
+// In package.json
+"build": {
+  "win": {
+    "certificateFile": "path/to/certificate.pfx",
+    "certificatePassword": "password"
   }
+}
 }
 ```
 
@@ -252,11 +256,11 @@ autoUpdater.setFeedURL({
 
 # 2. Build application
 npm run build
-npm run make
+npm run dist
 
 # 3. Publish to GitHub
 # Either manually upload to GitHub Releases
-# or use: npm run publish (if configured)
+# or use: npm run release (with GH_TOKEN set)
 
 # 4. Users automatically notified
 # App checks for updates and shows dialog

@@ -145,9 +145,9 @@ Check the top-right corner of the app to see what's available.
 
 ```bash
 # Build executables for your platform
-npm run make
+npm run dist
 
-# Output will be in /out directory
+# Output will be in /release directory
 ```
 
 ## Supported Formats

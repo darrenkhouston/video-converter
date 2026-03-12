@@ -34,7 +34,7 @@ After the icons are generated, rebuild:
 
 ```bash
 npm run build
-npm run make
+npm run dist
 ```
 
 ## What Each Icon Format Does
@@ -66,7 +66,7 @@ If `npm run build:icons` doesn't work, you can convert manually:
 **Icons not showing after build?**
 - Make sure source PNGs are in the `assets/` folder
 - Verify `assets/icons/` folder was created with .icns and .ico files
-- Rebuild completely: `npm run build && npm run make`
+- Rebuild completely: `npm run build && npm run dist`
 - Check file names match exactly in `assets/icons/`: `icon.icns`, `icon.ico`
 
 **Build errors?**
@@ -77,7 +77,7 @@ If `npm run build:icons` doesn't work, you can convert manually:
 ## Icon Configuration Locations
 
 Your icons are configured in:
-1. **forge.config.js** - Line 4: `icon: './assets/icons/icon'`
+1. **package.json** - build.mac.icon and build.win.icon fields point to `assets/icons/icon.icns` and `assets/icons/icon.ico`
 2. **src/main/main.ts** - BrowserWindow icon property points to `assets/icons/512x512.png`
 3. **package.json** - build:icons script
 

@@ -46,15 +46,17 @@ video-converter/
 │       ├── types.ts           # TypeScript interfaces
 │       └── config.ts          # Constants & presets
 ├── dist/                      # Compiled output
+├── release/                   # Built installers
 ├── assets/                    # Icons (placeholder)
-├── package.json              # Dependencies & scripts
+├── package.json              # Dependencies, scripts & build config
 ├── tsconfig.json             # TypeScript config
 ├── vite.config.ts            # Vite bundler config
-├── forge.config.js           # Electron Forge packaging
 ├── README.md                 # Full documentation
 ├── QUICKSTART.md             # Quick start guide
 └── .github/
-    └── copilot-instructions.md  # Project context
+    ├── copilot-instructions.md  # Project context
+    └── workflows/
+        └── build.yml         # CI/CD pipeline
 ```
 
 ## 🚀 How to Run
