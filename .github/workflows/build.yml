@@ -59,7 +59,15 @@ jobs:
         with:
           name: ${{ matrix.platform }}-build
           path: |
-            release/**/*
+            release/*.dmg
+            release/*.zip
+            release/*.exe
+            release/*.deb
+            release/*.AppImage
+            release/*.rpm
+            release/*.yml
+            release/*.yaml
+            release/*.blockmap
           retention-days: 7
 
   release:
